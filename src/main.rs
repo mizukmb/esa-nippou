@@ -1,6 +1,10 @@
 extern crate clap;
 use clap::{App};
 
+fn run() {
+    println!("{}", "Hello, esa-nippou!");
+}
+
 fn main() {
     let name = env!("CARGO_PKG_NAME");
     let version = env!("CARGO_PKG_VERSION");
@@ -12,5 +16,5 @@ fn main() {
         .about(about)
         .get_matches();
 
-    let esa_url = "";
+    run();
 }
