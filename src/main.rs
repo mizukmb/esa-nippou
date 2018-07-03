@@ -1,8 +1,29 @@
 extern crate clap;
+extern crate reqwest;
+
 use clap::{App};
+use reqwest::header::{Authorization, Bearer};
 
 fn run() {
-    println!("{}", "Hello, esa-nippou!");
+    let base_url = "https://api.esa.io/v1";
+    let access_token = "XXXXXXXXXXXXXXXXXXXXXXX";
+    let team = "XXXXXXXXXXXX";
+    let path = format!("teams/{team}/posts", team=team);
+    let url = format!("{base_url}/{path}", base_url=base_url, path=path);
+
+    let client = reqwest::Client::new();
+    let mut res = client.get(&url)
+        .header(
+            Authorization(
+                Bearer{
+                    token: access_token.to_string()
+                }
+            )
+        )
+        .send()
+        .unwrap();
+    println!("{}", res.text().unwrap());
+
 }
 
 fn main() {
