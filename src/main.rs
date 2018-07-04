@@ -1,8 +1,10 @@
 extern crate clap;
+extern crate chrono;
 extern crate reqwest;
 
 use clap::{App};
 use reqwest::header::{Authorization, Bearer};
+use chrono::prelude::*;
 
 fn run() {
     let base_url = "https://api.esa.io/v1";
@@ -10,6 +12,9 @@ fn run() {
     let team = env!("ESA_NIPPOU_TEAMS");
     let path = format!("teams/{team}/posts", team=team);
     let url = format!("{base_url}/{path}", base_url=base_url, path=path);
+    let today = Local::now().format("%Y-%m-%d");
+    let created = today.to_string();
+    let query = format!("created:>{created}", created=created);
 
     let client = reqwest::Client::new();
     let mut res = client.get(&url)
@@ -20,6 +25,7 @@ fn run() {
                 }
             )
         )
+        .query(&[("q", &query)])
         .send()
         .unwrap();
     println!("{}", res.text().unwrap());
