@@ -6,8 +6,8 @@ use reqwest::header::{Authorization, Bearer};
 
 fn run() {
     let base_url = "https://api.esa.io/v1";
-    let access_token = "XXXXXXXXXXXXXXXXXXXXXXX";
-    let team = "XXXXXXXXXXXX";
+    let access_token = env!("ESA_NIPPOU_ACCESS_TOKEN");
+    let team = env!("ESA_NIPPOU_TEAMS");
     let path = format!("teams/{team}/posts", team=team);
     let url = format!("{base_url}/{path}", base_url=base_url, path=path);
 
