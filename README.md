@@ -45,7 +45,7 @@ Execute.
 
 ```console
 $ esa-nippou
-- [path/to/mizukmb の日報](https://XXXXXX.esa.io/posts/123456) by @mizukmb
+- [path/to/mizukmb の日報](https://example.esa.io/posts/123456) by @mizukmb
 ```
 
 ## Author
