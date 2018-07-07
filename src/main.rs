@@ -9,22 +9,26 @@ use chrono::prelude::*;
 use serde_json::Value;
 
 #[derive(Debug)]
-struct Article<'a> {
-    pub title: &'a str,
-    pub url: &'a str
+struct Article {
+    title: String,
+    url: String
 }
 
-impl<'a> Article<'a> {
-    pub fn new(p:(&'a str, &'a str)) -> Article {
+impl Article {
+    pub fn new(p:(String, String)) -> Article {
         Article{title: p.0, url: p.1}
+    }
+
+    fn to_markdown_link(&self) -> String {
+        format!("[{title}]({url})", title=self.title, url=self.url)
     }
 }
 
-fn extract<'a>(value: &'a Value) -> Vec<Article<'a>> {
+fn extract(value: &Value) -> Vec<Article> {
     let mut articles: Vec<Article> = Vec::new();
 
     for i in value["posts"].as_array().unwrap() {
-        articles.push(Article::new(((i["full_name"].as_str().unwrap(), i["url"].as_str().unwrap()))));
+        articles.push( Article::new(( i["full_name"].to_string(), i["url"].to_string() )) );
     }
 
     articles
@@ -55,7 +59,7 @@ fn run() {
 
     let value: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
 
-    println!("{:?}", extract(&value).first().unwrap());
+    println!("{:?}", extract(&value).first().unwrap().to_markdown_link());
 }
 
 fn main() {
