@@ -45,10 +45,11 @@ fn run() {
     let access_token = env!("ESA_NIPPOU_ACCESS_TOKEN");
     let today = Local::now().format("%Y-%m-%d");
     let created = today.to_string();
-    let query = format!("created:>{created}", created=created);
+    let username = env!("ESA_NIPPOU_USERNAME");
+    let query = format!("created:>{created} user:{username}", created="2018-07-06", username=username);
 
-    let client = reqwest::Client::new();
-    let mut res = client.get(&posts_url)
+    let posts_client = reqwest::Client::new();
+    let mut posts_res = posts_client.get(&posts_url)
         .header(
             Authorization(
                 Bearer{
@@ -56,12 +57,12 @@ fn run() {
                 }
             )
         )
-        .query(&[("q", "2018-01-01")])
+        .query(&[("q", query)])
         .send()
         .unwrap();
 
-    let value: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
-    let articles = extract(&value);
+    let posts_value: Value = serde_json::from_str(&posts_res.text().unwrap()).unwrap();
+    let articles = extract(&posts_value);
 
     for article in articles {
         println!("{}", article.to_markdown_link());
