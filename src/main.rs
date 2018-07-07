@@ -11,16 +11,17 @@ use serde_json::Value;
 #[derive(Debug)]
 struct Article {
     title: String,
-    url: String
+    url: String,
+    screen_name: String
 }
 
 impl Article {
-    pub fn new(p:(String, String)) -> Article {
-        Article{title: p.0, url: p.1}
+    pub fn new(p:(String, String, String)) -> Article {
+        Article{title: p.0, url: p.1, screen_name: p.2}
     }
 
     fn to_markdown_link(&self) -> String {
-        format!("[{title}]({url})", title=self.title, url=self.url)
+        format!("- [{title}]({url}) by @{screen_name}", title=self.title, url=self.url, screen_name=self.screen_name)
     }
 }
 
@@ -28,7 +29,7 @@ fn extract(value: &Value) -> Vec<Article> {
     let mut articles: Vec<Article> = Vec::new();
 
     for i in value["posts"].as_array().unwrap() {
-        articles.push( Article::new(( i["full_name"].to_string(), i["url"].to_string() )) );
+        articles.push( Article::new(( i["full_name"].to_string(), i["url"].to_string(), i["created_by"]["screen_name"].to_string() )) );
     }
 
     articles
@@ -59,7 +60,7 @@ fn run() {
 
     let value: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
 
-    println!("{:?}", extract(&value).first().unwrap().to_markdown_link());
+    println!("{}", extract(&value).first().unwrap().to_markdown_link());
 }
 
 fn main() {
