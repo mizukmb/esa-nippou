@@ -37,17 +37,18 @@ fn extract(value: &Value) -> Vec<Article> {
 }
 
 fn run() {
-    let base_url = "https://api.esa.io/v1";
-    let access_token = env!("ESA_NIPPOU_ACCESS_TOKEN");
+    let base_url = "https://api.esa.io";
+    let api_version = "v1";
     let team = env!("ESA_NIPPOU_TEAMS");
-    let path = format!("teams/{team}/posts", team=team);
-    let url = format!("{base_url}/{path}", base_url=base_url, path=path);
+    let posts_url = format!("{base_url}/{api_version}/teams/{team}/posts", base_url=base_url, api_version=api_version, team=team);
+
+    let access_token = env!("ESA_NIPPOU_ACCESS_TOKEN");
     let today = Local::now().format("%Y-%m-%d");
     let created = today.to_string();
     let query = format!("created:>{created}", created=created);
 
     let client = reqwest::Client::new();
-    let mut res = client.get(&url)
+    let mut res = client.get(&posts_url)
         .header(
             Authorization(
                 Bearer{
