@@ -8,7 +8,6 @@ use reqwest::header::{Authorization, Bearer};
 use chrono::prelude::*;
 use serde_json::Value;
 
-#[derive(Debug)]
 struct Article {
     title: String,
     url: String,
@@ -29,7 +28,9 @@ fn extract(value: &Value) -> Vec<Article> {
     let mut articles: Vec<Article> = Vec::new();
 
     for i in value["posts"].as_array().unwrap() {
-        articles.push( Article::new(( i["full_name"].to_string(), i["url"].to_string(), i["created_by"]["screen_name"].to_string() )) );
+        // `XXX.as_str().unwrap().to_string()` convert from JSON to String without `""`
+        // see: https://github.com/serde-rs/json/issues/367
+        articles.push( Article::new(( i["full_name"].as_str().unwrap().to_string(), i["url"].as_str().unwrap().to_string(), i["created_by"]["screen_name"].as_str().unwrap().to_string() )) );
     }
 
     articles
