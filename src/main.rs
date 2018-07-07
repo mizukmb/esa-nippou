@@ -1,10 +1,34 @@
 extern crate clap;
 extern crate chrono;
 extern crate reqwest;
+extern crate serde_json;
 
 use clap::{App};
 use reqwest::header::{Authorization, Bearer};
 use chrono::prelude::*;
+use serde_json::Value;
+
+#[derive(Debug)]
+struct Article<'a> {
+    pub title: &'a str,
+    pub url: &'a str
+}
+
+impl<'a> Article<'a> {
+    pub fn new(p:(&'a str, &'a str)) -> Article {
+        Article{title: p.0, url: p.1}
+    }
+}
+
+fn extract<'a>(value: &'a Value) -> Vec<Article<'a>> {
+    let mut articles: Vec<Article> = Vec::new();
+
+    for i in value["posts"].as_array().unwrap() {
+        articles.push(Article::new(((i["full_name"].as_str().unwrap(), i["url"].as_str().unwrap()))));
+    }
+
+    articles
+}
 
 fn run() {
     let base_url = "https://api.esa.io/v1";
@@ -25,11 +49,13 @@ fn run() {
                 }
             )
         )
-        .query(&[("q", &query)])
+        .query(&[("q", "2018-01-01")])
         .send()
         .unwrap();
-    println!("{}", res.text().unwrap());
 
+    let value: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
+
+    println!("{:?}", extract(&value).first().unwrap());
 }
 
 fn main() {
