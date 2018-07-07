@@ -59,8 +59,11 @@ fn run() {
         .unwrap();
 
     let value: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
+    let articles = extract(&value);
 
-    println!("{}", extract(&value).first().unwrap().to_markdown_link());
+    for article in articles {
+        println!("{}", article.to_markdown_link());
+    }
 }
 
 fn main() {
