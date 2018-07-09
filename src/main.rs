@@ -26,7 +26,7 @@ impl Article {
         md = format!("- [{title}]({url}) by @{screen_name}", title=self.title, url=self.url, screen_name=self.screen_name);
 
         if self.wip {
-            md = format!("{md} - **WIP**", md=&md);
+            md = format!("{md} **WIP**", md=&md);
         }
 
         md
