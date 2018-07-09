@@ -11,16 +11,25 @@ use serde_json::Value;
 struct Article {
     title: String,
     url: String,
-    screen_name: String
+    screen_name: String,
+    wip: bool
 }
 
 impl Article {
-    pub fn new(p:(String, String, String)) -> Article {
-        Article{title: p.0, url: p.1, screen_name: p.2}
+    pub fn new(p:(String, String, String, bool)) -> Article {
+        Article{title: p.0, url: p.1, screen_name: p.2, wip: p.3}
     }
 
     fn to_markdown_link(&self) -> String {
-        format!("- [{title}]({url}) by @{screen_name}", title=self.title, url=self.url, screen_name=self.screen_name)
+        let mut md: String;
+
+        md = format!("- [{title}]({url}) by @{screen_name}", title=self.title, url=self.url, screen_name=self.screen_name);
+
+        if self.wip {
+            md = format!("{md} - **WIP**", md=&md);
+        }
+
+        md
     }
 }
 
@@ -30,7 +39,7 @@ fn extract(value: &Value) -> Vec<Article> {
     for i in value["posts"].as_array().unwrap() {
         // `XXX.as_str().unwrap().to_string()` convert from JSON to String without `""`
         // see: https://github.com/serde-rs/json/issues/367
-        articles.push( Article::new(( i["full_name"].as_str().unwrap().to_string(), i["url"].as_str().unwrap().to_string(), i["created_by"]["screen_name"].as_str().unwrap().to_string() )) );
+        articles.push( Article::new(( i["full_name"].as_str().unwrap().to_string(), i["url"].as_str().unwrap().to_string(), i["created_by"]["screen_name"].as_str().unwrap().to_string(), i["wip"].as_bool().unwrap() )) );
     }
 
     articles
@@ -46,7 +55,7 @@ fn run() {
     let today = Local::now().format("%Y-%m-%d");
     let created = today.to_string();
     let username = env!("ESA_NIPPOU_USERNAME");
-    let query = format!("created:>{created} user:{username}", created="2018-07-06", username=username);
+    let query = format!("created:>{created} user:{username}", created=created, username=username);
 
     let posts_client = reqwest::Client::new();
     let mut posts_res = posts_client.get(&posts_url)
