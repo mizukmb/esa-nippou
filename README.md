@@ -22,7 +22,7 @@ Please set enviroment variables.
 $ cargo build
 ```
 
-or download from release page (WIP).
+or download from [release page](https://github.com/mizukmb/esa-nippou/releases) (`x86_64-apple-darwin` only).
 
 ## Usage
 
