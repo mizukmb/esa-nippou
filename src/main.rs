@@ -73,6 +73,9 @@ fn run() {
     let posts_value: Value = serde_json::from_str(&posts_res.text().unwrap()).unwrap();
     let articles = extract(&posts_value);
 
+    println!("## {team}.esa.io", team=team);
+    println!(""); // for new line
+
     for article in articles {
         println!("{}", article.to_markdown_link());
     }
