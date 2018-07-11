@@ -3,10 +3,11 @@ extern crate chrono;
 extern crate reqwest;
 extern crate serde_json;
 
-use clap::{App};
+use clap::{Arg, ArgMatches, App};
 use reqwest::header::{Authorization, Bearer};
 use chrono::prelude::*;
 use serde_json::Value;
+use std::str::FromStr;
 
 struct Article {
     title: String,
@@ -45,7 +46,11 @@ fn extract(value: &Value) -> Vec<Article> {
     articles
 }
 
-fn run() {
+fn build_query(created: String, username: String, wip: bool) -> String {
+    format!("created:>{created} user:{username} wip:{wip}", created=created, username=username, wip=wip)
+}
+
+fn run(app: ArgMatches) {
     let base_url = "https://api.esa.io";
     let api_version = "v1";
     let team = env!("ESA_NIPPOU_TEAMS");
@@ -54,8 +59,9 @@ fn run() {
     let access_token = env!("ESA_NIPPOU_ACCESS_TOKEN");
     let today = Local::now().format("%Y-%m-%d");
     let created = today.to_string();
-    let username = env!("ESA_NIPPOU_USERNAME");
-    let query = format!("created:>{created} user:{username}", created=created, username=username);
+    let username = env!("ESA_NIPPOU_USERNAME").to_string();
+    let wip = FromStr::from_str(app.value_of("wip").unwrap()).unwrap();
+    let query = build_query(created, username, wip);
 
     let posts_client = reqwest::Client::new();
     let mut posts_res = posts_client.get(&posts_url)
@@ -86,11 +92,18 @@ fn main() {
     let version = env!("CARGO_PKG_VERSION");
     let author = env!("CARGO_PKG_AUTHORS");
     let about = "Print today's your esa.io articles";
-    App::new(name)
-        .version(version)
-        .author(author)
-        .about(about)
-        .get_matches();
+    let app = App::new(name)
+                .version(version)
+                .author(author)
+                .about(about)
+                .arg(Arg::with_name("wip")
+                    .short("w")
+                    .long("wip")
+                    .value_name("BOOL")
+                    .help("Print with WIP article (true|false)")
+                    .takes_value(true)
+                    .default_value("true"))
+                .get_matches();
 
-    run();
+    run(app);
 }
