@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate clap;
 extern crate chrono;
 extern crate reqwest;
@@ -60,7 +61,7 @@ fn run(app: ArgMatches) {
     let today = Local::now().format("%Y-%m-%d");
     let created = today.to_string();
     let username = env!("ESA_NIPPOU_USERNAME").to_string();
-    let wip = FromStr::from_str(app.value_of("wip").unwrap()).unwrap();
+    let wip = value_t_or_exit!(app.value_of("wip"), bool);
     let query = build_query(created, username, wip);
 
     let posts_client = reqwest::Client::new();
