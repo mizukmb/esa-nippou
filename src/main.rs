@@ -3,12 +3,16 @@ extern crate clap;
 extern crate chrono;
 extern crate reqwest;
 extern crate serde_json;
+extern crate rpassword;
 
-use clap::{Arg, ArgMatches, App};
+use clap::{Arg, ArgMatches, App, SubCommand};
 use reqwest::header::{Authorization, Bearer};
 use chrono::prelude::*;
 use serde_json::Value;
-use std::str::FromStr;
+use std::io;
+use std::io::Write;
+
+mod esa_config;
 
 struct Article {
     title: String,
@@ -88,6 +92,23 @@ fn run(app: ArgMatches) {
     }
 }
 
+fn init() {
+    let mut team = String::new();
+    let mut screen_name = String::new();
+
+    let parsonal_access_token = rpassword::prompt_password_stdout("Personal access token (hidden): ").unwrap();
+    print!("Team: ");
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut team).unwrap();
+    print!("Screen name: ");
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut screen_name).unwrap();
+
+    let config = esa_config::new((team.trim().to_string(), screen_name.trim().to_string(), parsonal_access_token.trim().to_string()));
+
+    config.write();
+}
+
 fn main() {
     let name = env!("CARGO_PKG_NAME");
     let version = env!("CARGO_PKG_VERSION");
@@ -104,7 +125,13 @@ fn main() {
                     .help("Print with WIP article (true|false)")
                     .takes_value(true)
                     .default_value("true"))
+                .subcommand(
+                    SubCommand::with_name("init")
+                        .about("Initialize configurations interactively"))
                 .get_matches();
 
-    run(app);
+    match app.subcommand_name() {
+        Some("init") => {init()},
+        _ => {run(app)},
+    }
 }
