@@ -3,12 +3,18 @@ extern crate clap;
 extern crate chrono;
 extern crate reqwest;
 extern crate serde_json;
+extern crate serde_yaml;
+extern crate rpassword;
 
-use clap::{Arg, ArgMatches, App};
+use clap::{Arg, ArgMatches, App, SubCommand};
 use reqwest::header::{Authorization, Bearer};
 use chrono::prelude::*;
 use serde_json::Value;
-use std::str::FromStr;
+use std::env;
+use std::io;
+use std::io::Write;
+
+mod esa_config;
 
 struct Article {
     title: String,
@@ -52,15 +58,26 @@ fn build_query(created: String, username: String, wip: bool) -> String {
 }
 
 fn run(app: ArgMatches) {
+    let config = esa_config::load();
     let base_url = "https://api.esa.io";
     let api_version = "v1";
-    let team = env!("ESA_NIPPOU_TEAMS");
+    let team = match env::var("ESA_NIPPOU_TEAM") {
+                            Ok(val) => val,
+                            Err(_e) => config.team
+                        };
     let posts_url = format!("{base_url}/{api_version}/teams/{team}/posts", base_url=base_url, api_version=api_version, team=team);
 
-    let access_token = env!("ESA_NIPPOU_ACCESS_TOKEN");
+    let access_token = match env::var("ESA_NIPPOU_ACCESS_TOKEN") {
+                            Ok(val) => val,
+                            Err(_e) => config.parsonal_access_token
+                        };
+
     let today = Local::now().format("%Y-%m-%d");
     let created = today.to_string();
-    let username = env!("ESA_NIPPOU_USERNAME").to_string();
+    let username = match env::var("ESA_NIPPOU_SCREEN_NAME") {
+                    Ok(val) => val,
+                    Err(_e) => config.screen_name
+                };
     let wip = value_t_or_exit!(app.value_of("wip"), bool);
     let query = build_query(created, username, wip);
 
@@ -88,6 +105,23 @@ fn run(app: ArgMatches) {
     }
 }
 
+fn init() {
+    let mut team = String::new();
+    let mut screen_name = String::new();
+
+    let parsonal_access_token = rpassword::prompt_password_stdout("Personal access token (hidden): ").unwrap();
+    print!("Team: ");
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut team).unwrap();
+    print!("Screen name: ");
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut screen_name).unwrap();
+
+    let config = esa_config::new((team.trim().to_string(), screen_name.trim().to_string(), parsonal_access_token.trim().to_string()));
+
+    config.write();
+}
+
 fn main() {
     let name = env!("CARGO_PKG_NAME");
     let version = env!("CARGO_PKG_VERSION");
@@ -104,7 +138,13 @@ fn main() {
                     .help("Print with WIP article (true|false)")
                     .takes_value(true)
                     .default_value("true"))
+                .subcommand(
+                    SubCommand::with_name("init")
+                        .about("Initialize configurations interactively"))
                 .get_matches();
 
-    run(app);
+    match app.subcommand_name() {
+        Some("init") => {init()},
+        _ => {run(app)},
+    }
 }
