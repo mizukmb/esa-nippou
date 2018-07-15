@@ -6,7 +6,21 @@
 
 ## Setup
 
-Please set enviroment variables.
+Please execute `esa-nippou init` command. It Sets required configurations on interactive mode.
+
+```console
+$ esa-nippou init
+Personal access token (hidden):
+Team: XXXXXX
+Screen name: mizukmb
+$ cat ~/.esanippourc
+esanippou:
+  team: XXXXXX
+  screen_name: mizukmb
+  parsonal_access_token: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
+
+or enviroment variables (load priority: .esanippourc > environment variables).
 
 - `ESA_NIPPOU_ACCESS_TOKEN` (**required**)
   - esa.io personal access tokens
