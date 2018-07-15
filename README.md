@@ -20,7 +20,7 @@ esanippou:
   parsonal_access_token: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-or enviroment variables (load priority: .esanippourc > environment variables).
+or enviroment variables (load priority: .esanippourc < environment variables).
 
 - `ESA_NIPPOU_ACCESS_TOKEN` (**required**)
   - esa.io personal access tokens
