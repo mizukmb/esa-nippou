@@ -11,11 +11,11 @@ Please execute `esa-nippou init` command. It Sets required configurations on int
 ```console
 $ esa-nippou init
 Personal access token (hidden):
-Team: XXXXXX
+Team: example
 Screen name: mizukmb
 $ cat ~/.esanippourc
 esanippou:
-  team: XXXXXX
+  team: example
   screen_name: mizukmb
   parsonal_access_token: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
@@ -46,16 +46,6 @@ $ esa-nippou
 ```
 
 ## Example
-
-Set up enviroment variables.
-
-```console
-$ export ESA_NIPPOU_ACCESS_TOKEN=XXXXX...
-$ export ESA_NIPPOU_TEAM=example
-$ export ESA_NIPPOU_USERNAME=mizukmb
-```
-
-Execute.
 
 ```console
 $ esa-nippou
