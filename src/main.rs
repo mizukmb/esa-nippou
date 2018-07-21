@@ -14,50 +14,16 @@ use std::env;
 use std::io;
 use std::io::Write;
 
+mod article;
 mod esa_config;
 
-struct Article {
-    title: String,
-    url: String,
-    screen_name: String,
-    wip: bool,
-}
-
-impl Article {
-    pub fn new(p: (String, String, String, bool)) -> Article {
-        Article {
-            title: p.0,
-            url: p.1,
-            screen_name: p.2,
-            wip: p.3,
-        }
-    }
-
-    fn to_markdown_link(&self) -> String {
-        let mut md: String;
-
-        md = format!(
-            "- [{title}]({url}) by @{screen_name}",
-            title = self.title,
-            url = self.url,
-            screen_name = self.screen_name
-        );
-
-        if self.wip {
-            md = format!("{md} **WIP**", md = &md);
-        }
-
-        md
-    }
-}
-
-fn extract(value: &Value) -> Vec<Article> {
-    let mut articles: Vec<Article> = Vec::new();
+fn extract(value: &Value) -> Vec<article::Article> {
+    let mut articles: Vec<article::Article> = Vec::new();
 
     for i in value["posts"].as_array().unwrap() {
         // `XXX.as_str().unwrap().to_string()` convert from JSON to String without `""`
         // see: https://github.com/serde-rs/json/issues/367
-        articles.push(Article::new((
+        articles.push(article::Article::new((
             i["full_name"].as_str().unwrap().to_string(),
             i["url"].as_str().unwrap().to_string(),
             i["created_by"]["screen_name"].as_str().unwrap().to_string(),
@@ -68,13 +34,29 @@ fn extract(value: &Value) -> Vec<Article> {
     articles
 }
 
-fn build_query(created: String, username: String, wip: bool) -> String {
+fn build_query_updated(date: &String, username: &String, wip: &bool) -> String {
     format!(
-        "created:>{created} user:{username} wip:{wip}",
-        created = created,
+        "updated:>{date} user:{username} wip:{wip}",
+        date = date,
         username = username,
         wip = wip
     )
+}
+
+fn post(url: &String, query: &String, access_token: &String) -> Vec<article::Article> {
+    let posts_client = reqwest::Client::new();
+    let mut posts_res = posts_client
+        .get(url)
+        .header(Authorization(Bearer {
+            token: access_token.to_string(),
+        }))
+        .query(&[("q", query)])
+        .send()
+        .unwrap();
+
+    let posts_value: Value = serde_json::from_str(&posts_res.text().unwrap()).unwrap();
+
+    extract(&posts_value)
 }
 
 fn run(app: ArgMatches) {
@@ -97,32 +79,19 @@ fn run(app: ArgMatches) {
         Err(_e) => config.parsonal_access_token,
     };
 
-    let today = Local::now().format("%Y-%m-%d");
-    let created = today.to_string();
+    let today = Local::now().format("%Y-%m-%d").to_string();
     let username = match env::var("ESA_NIPPOU_SCREEN_NAME") {
         Ok(val) => val,
         Err(_e) => config.screen_name,
     };
     let wip = value_t_or_exit!(app.value_of("wip"), bool);
-    let query = build_query(created, username, wip);
-
-    let posts_client = reqwest::Client::new();
-    let mut posts_res = posts_client
-        .get(&posts_url)
-        .header(Authorization(Bearer {
-            token: access_token.to_string(),
-        }))
-        .query(&[("q", query)])
-        .send()
-        .unwrap();
-
-    let posts_value: Value = serde_json::from_str(&posts_res.text().unwrap()).unwrap();
-    let articles = extract(&posts_value);
+    let query_for_updated = build_query_updated(&today, &username, &wip);
+    let updated_articles = post(&posts_url, &query_for_updated, &access_token);
 
     println!("### {team}.esa.io", team = team);
     println!(""); // for new line
 
-    for article in articles {
+    for article in updated_articles {
         println!("{}", article.to_markdown_link());
     }
 }
