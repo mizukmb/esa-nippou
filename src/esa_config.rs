@@ -41,7 +41,10 @@ pub fn load() -> EsaConfig {
 
     EsaConfig {
         team: value["esanippou"]["team"].as_str().unwrap().to_string(),
-        screen_name: value["esanippou"]["screen_name"].as_str().unwrap().to_string(),
+        screen_name: value["esanippou"]["screen_name"]
+            .as_str()
+            .unwrap()
+            .to_string(),
         parsonal_access_token: value["esanippou"]["parsonal_access_token"]
             .as_str()
             .unwrap()
