@@ -49,7 +49,10 @@ $ esa-nippou
 
 ```console
 $ esa-nippou
-- [path/to/mizukmb の日報](https://example.esa.io/posts/123456) by @mizukmb
+### mizukmb.esa.io
+
+- [Users/mizukmb/memo/foo](https://mizukmb.esa.io/posts/123456) by @mizukmb **WIP**
+- [/2018/07/25/mizukmb's diary(https://mizukmb.esa.io/posts/78910) by @mizukmb
 ```
 
 ## Author
