@@ -34,7 +34,15 @@ fn extract(value: &Value) -> Vec<article::Article> {
     articles
 }
 
-fn build_query_updated(date: &String, username: &String, wip: &bool) -> String {
+fn build_query_updated(date: &String, username: &String) -> String {
+    format!(
+        "updated:>{date} user:{username}",
+        date = date,
+        username = username
+    )
+}
+
+fn build_query_updated_with_wip(date: &String, username: &String, wip: &bool) -> String {
     format!(
         "updated:>{date} user:{username} wip:{wip}",
         date = date,
@@ -84,8 +92,12 @@ fn run(app: ArgMatches) {
         Ok(val) => val,
         Err(_e) => config.screen_name,
     };
-    let wip = value_t_or_exit!(app.value_of("wip"), bool);
-    let query_for_updated = build_query_updated(&today, &username, &wip);
+    let query_for_updated = if app.is_present("wip") {
+        let wip = value_t_or_exit!(app.value_of("wip"), bool);
+        build_query_updated_with_wip(&today, &username, &wip)
+    } else {
+        build_query_updated(&today, &username)
+    };
     let updated_articles = post(&posts_url, &query_for_updated, &access_token);
 
     println!("### {team}.esa.io", team = team);
@@ -132,9 +144,8 @@ fn main() {
                 .short("w")
                 .long("wip")
                 .value_name("BOOL")
-                .help("Print with WIP article (true|false)")
-                .takes_value(true)
-                .default_value("true"),
+                .help("Print with WIP article only (true|false)")
+                .takes_value(true),
         )
         .subcommand(SubCommand::with_name("init").about("Initialize configurations interactively"))
         .get_matches();
