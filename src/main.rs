@@ -6,28 +6,31 @@ extern crate rpassword;
 extern crate serde_json;
 extern crate serde_yaml;
 
+#[macro_use]
+extern crate serde_derive;
+
 use chrono::prelude::*;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use reqwest::header::{Authorization, Bearer};
-use serde_json::Value;
 use std::env;
 use std::io;
 use std::io::Write;
 
 mod article;
+mod esa;
 mod esa_config;
 
-fn extract(value: &Value) -> Vec<article::Article> {
+fn extract(value: esa::api::Posts) -> Vec<article::Article> {
     let mut articles: Vec<article::Article> = Vec::new();
 
-    for i in value["posts"].as_array().unwrap() {
+    for i in value.posts {
         // `XXX.as_str().unwrap().to_string()` convert from JSON to String without `""`
         // see: https://github.com/serde-rs/json/issues/367
         articles.push(article::Article::new((
-            i["full_name"].as_str().unwrap().to_string(),
-            i["url"].as_str().unwrap().to_string(),
-            i["created_by"]["screen_name"].as_str().unwrap().to_string(),
-            i["wip"].as_bool().unwrap(),
+            i.full_name,
+            i.url,
+            i.created_by.screen_name,
+            i.wip,
         )));
     }
 
@@ -62,9 +65,9 @@ fn post(url: &String, query: &String, access_token: &String) -> Vec<article::Art
         .send()
         .unwrap();
 
-    let posts_value: Value = serde_json::from_str(&posts_res.text().unwrap()).unwrap();
+    let posts_value: esa::api::Posts = serde_json::from_str(&posts_res.text().unwrap()).unwrap();
 
-    extract(&posts_value)
+    extract(posts_value)
 }
 
 fn run(app: ArgMatches) {
