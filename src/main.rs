@@ -37,21 +37,12 @@ fn extract(value: esa::api::Posts) -> Vec<article::Article> {
     articles
 }
 
-fn build_query_updated(date: &String, username: &String) -> String {
-    format!(
-        "updated:>{date} user:{username}",
-        date = date,
-        username = username
-    )
+fn build_query_updated(date: String, screen_name: String) -> String {
+    esa::query::Query::new().user(screen_name).updated(date).to_string()
 }
 
-fn build_query_updated_with_wip(date: &String, username: &String, wip: &bool) -> String {
-    format!(
-        "updated:>{date} user:{username} wip:{wip}",
-        date = date,
-        username = username,
-        wip = wip
-    )
+fn build_query_updated_with_wip(date: String, screen_name: String, wip: bool) -> String {
+    esa::query::Query::new().wip(wip).user(screen_name).updated(date).to_string()
 }
 
 fn post(url: &String, query: &String, access_token: &String) -> Vec<article::Article> {
@@ -97,9 +88,9 @@ fn run(app: ArgMatches) {
     };
     let query_for_updated = if app.is_present("wip") {
         let wip = value_t_or_exit!(app.value_of("wip"), bool);
-        build_query_updated_with_wip(&today, &username, &wip)
+        build_query_updated_with_wip(today, username, wip)
     } else {
-        build_query_updated(&today, &username)
+        build_query_updated(today, username)
     };
     let updated_articles = post(&posts_url, &query_for_updated, &access_token);
 
