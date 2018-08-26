@@ -24,8 +24,6 @@ fn extract(value: esa::api::Posts) -> Vec<article::Article> {
     let mut articles: Vec<article::Article> = Vec::new();
 
     for i in value.posts {
-        // `XXX.as_str().unwrap().to_string()` convert from JSON to String without `""`
-        // see: https://github.com/serde-rs/json/issues/367
         articles.push(article::Article::new((
             i.full_name,
             i.url,
