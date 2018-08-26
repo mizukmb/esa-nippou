@@ -35,21 +35,6 @@ fn extract(value: esa::api::Posts) -> Vec<article::Article> {
     articles
 }
 
-fn build_query_updated(date: String, screen_name: String) -> String {
-    esa::query::Query::new()
-        .user(screen_name)
-        .updated(date)
-        .to_string()
-}
-
-fn build_query_updated_with_wip(date: String, screen_name: String, wip: bool) -> String {
-    esa::query::Query::new()
-        .wip(wip)
-        .user(screen_name)
-        .updated(date)
-        .to_string()
-}
-
 fn post(url: &String, query: &String, access_token: &String) -> Vec<article::Article> {
     let posts_client = reqwest::Client::new();
     let mut posts_res = posts_client
@@ -86,18 +71,33 @@ fn run(app: ArgMatches) {
         Err(_e) => config.parsonal_access_token,
     };
 
-    let today = Local::now().format("%Y-%m-%d").to_string();
-    let username = match env::var("ESA_NIPPOU_SCREEN_NAME") {
+    let since_date = if app.is_present("since_date") {
+        app.value_of("since_date").unwrap().to_string()
+    } else {
+        Local::now().format("%Y-%m-%d").to_string()
+    };
+    let screen_name = match env::var("ESA_NIPPOU_SCREEN_NAME") {
         Ok(val) => val,
         Err(_e) => config.screen_name,
     };
-    let query_for_updated = if app.is_present("wip") {
-        let wip = value_t_or_exit!(app.value_of("wip"), bool);
-        build_query_updated_with_wip(today, username, wip)
+
+    let mut query = esa::query::Query::new()
+        .user(screen_name)
+        .updated_gt(since_date);
+
+    query = if app.is_present("until_date") {
+        query.updated_lt(app.value_of("until_date").unwrap().to_string())
     } else {
-        build_query_updated(today, username)
+        query
     };
-    let updated_articles = post(&posts_url, &query_for_updated, &access_token);
+
+    query = if app.is_present("wip") {
+        query.wip(value_t_or_exit!(app.value_of("wip"), bool))
+    } else {
+        query
+    };
+
+    let updated_articles = post(&posts_url, &query.to_string(), &access_token);
 
     println!("### {team}.esa.io", team = team);
     println!(""); // for new line
@@ -144,6 +144,22 @@ fn main() {
                 .long("wip")
                 .value_name("BOOL")
                 .help("Print with WIP article only (true|false)")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("since_date")
+                .short("s")
+                .long("since-date")
+                .value_name("DATE")
+                .help("Retrieves esa.io articles since the date")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("until_date")
+                .short("u")
+                .long("until-date")
+                .value_name("DATE")
+                .help("Retrieves esa.io articles until the date")
                 .takes_value(true),
         )
         .subcommand(SubCommand::with_name("init").about("Initialize configurations interactively"))

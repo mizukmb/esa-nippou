@@ -25,10 +25,20 @@ impl Query {
         }
     }
 
-    pub fn updated(&self, updated: String) -> Query {
+    pub fn updated_gt(&self, updated: String) -> Query {
         Query {
             string: format!(
-                "{self} updated:{updated}",
+                "{self} updated:>{updated}",
+                self = &self.string,
+                updated = updated
+            ),
+        }
+    }
+
+    pub fn updated_lt(&self, updated: String) -> Query {
+        Query {
+            string: format!(
+                "{self} updated:<{updated}",
                 self = &self.string,
                 updated = updated
             ),
@@ -61,24 +71,37 @@ mod tests {
     }
 
     #[test]
-    fn build_query_updated() {
+    fn build_query_updated_gt() {
         let updated = "2018-08-26".to_string();
-        let subject = Query::new().updated(updated).to_string();
+        let subject = Query::new().updated_gt(updated).to_string();
 
-        assert_eq!(subject, " updated:2018-08-26");
+        assert_eq!(subject, " updated:>2018-08-26");
+    }
+
+    #[test]
+    fn build_query_updated_lt() {
+        let updated = "2018-08-26".to_string();
+        let subject = Query::new().updated_lt(updated).to_string();
+
+        assert_eq!(subject, " updated:<2018-08-26");
     }
 
     #[test]
     fn build_query_chain() {
         let wip = true;
         let screen_name = "mizukmb".to_string();
-        let updated = "2018-08-26".to_string();
+        let updated_gt = "2018-08-22".to_string();
+        let updated_lt = "2018-08-26".to_string();
         let subject = Query::new()
             .wip(wip)
             .user(screen_name)
-            .updated(updated)
+            .updated_gt(updated_gt)
+            .updated_lt(updated_lt)
             .to_string();
 
-        assert_eq!(subject, " wip:true user:mizukmb updated:2018-08-26");
+        assert_eq!(
+            subject,
+            " wip:true user:mizukmb updated:>2018-08-22 updated:<2018-08-26"
+        );
     }
 }
