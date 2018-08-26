@@ -38,11 +38,18 @@ fn extract(value: esa::api::Posts) -> Vec<article::Article> {
 }
 
 fn build_query_updated(date: String, screen_name: String) -> String {
-    esa::query::Query::new().user(screen_name).updated(date).to_string()
+    esa::query::Query::new()
+        .user(screen_name)
+        .updated(date)
+        .to_string()
 }
 
 fn build_query_updated_with_wip(date: String, screen_name: String, wip: bool) -> String {
-    esa::query::Query::new().wip(wip).user(screen_name).updated(date).to_string()
+    esa::query::Query::new()
+        .wip(wip)
+        .user(screen_name)
+        .updated(date)
+        .to_string()
 }
 
 fn post(url: &String, query: &String, access_token: &String) -> Vec<article::Article> {
