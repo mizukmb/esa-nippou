@@ -1,6 +1,6 @@
 [package]
 name = "esa-nippou"
-version = "0.4.1"
+version = "0.5.0"
 authors = ["mizukmb <mizukmb6@gmail.com>"]
 
 [dependencies]
