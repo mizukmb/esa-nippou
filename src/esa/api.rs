@@ -1,12 +1,12 @@
 #[derive(Serialize, Deserialize, Debug)]
-pub struct UpdatedAt {
+pub struct UpdatedBy {
     name: String,
     screen_name: String,
     icon: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CreatedAt {
+pub struct CreatedBy {
     name: String,
     pub screen_name: String,
     icon: String,
@@ -27,8 +27,8 @@ pub struct Post {
     message: String,
     pub url: String,
     revision_number: u32,
-    pub created_by: CreatedAt,
-    updated_by: UpdatedAt,
+    pub created_by: CreatedBy,
+    updated_by: UpdatedBy,
     kind: String,
     comments_count: u8,
     tasks_count: u8,
