@@ -3,6 +3,7 @@ extern crate clap;
 extern crate chrono;
 extern crate reqwest;
 extern crate rpassword;
+extern crate serde;
 extern crate serde_json;
 extern crate serde_yaml;
 
@@ -28,6 +29,9 @@ fn extract(value: esa::api::Posts) -> Vec<article::Article> {
             i.full_name,
             i.url,
             i.created_by.screen_name,
+            i.updated_by.screen_name,
+            i.created_at,
+            i.updated_at,
             i.wip,
         )));
     }
