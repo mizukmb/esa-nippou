@@ -35,19 +35,22 @@ impl Article {
     }
 
     pub fn to_markdown_link(&self) -> String {
+        const MEMBERS_URL: &str = "https://misoca.esa.io/members";
         let mut md = format!("- [{title}]({url})", title = self.title, url = self.url);
 
         if self.created_at == self.updated_at {
             md = format!(
-                "{md} created by @{created_by}",
+                "{md} created by :@{created_by}: [{created_by}]({members_url}/{created_by})",
                 md = &md,
-                created_by = self.created_by
+                created_by = self.created_by,
+                members_url = MEMBERS_URL
             );
         } else {
             md = format!(
-                "{md} updated by @{updated_by}",
+                "{md} updated by :@{updated_by}: [{updated_by}]({members_url}/{updated_by})",
                 md = &md,
-                updated_by = self.updated_by
+                updated_by = self.updated_by,
+                members_url = MEMBERS_URL
             );
         }
 
