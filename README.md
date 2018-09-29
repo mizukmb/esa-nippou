@@ -4,6 +4,15 @@
 
 `esa-nippou` is inspired by [masutaka/github-nippou](https://github.com/masutaka/github-nippou).
 
+## Install
+
+[Homebrew](https://brew.sh/)
+
+```console
+$ brew tap mizukmb/homebrew-esa-nippou
+$ brew install esa-nippou
+```
+
 ## Setup
 
 Please execute `esa-nippou init` command. It Sets required configurations on interactive mode.
