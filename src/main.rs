@@ -101,6 +101,12 @@ fn run(app: ArgMatches) {
         query
     };
 
+    query = if app.is_present("not_in") {
+        query.not_in(app.value_of("not_in").unwrap().to_string())
+    } else {
+        query
+    };
+
     let updated_articles = post(&posts_url, &query.to_string(), &access_token);
 
     println!("### {team}.esa.io", team = team);
@@ -164,6 +170,13 @@ fn main() {
                 .long("until-date")
                 .value_name("DATE")
                 .help("Retrieves esa.io articles until the date")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("not_in")
+                .long("not-in")
+                .value_name("KEYWORD")
+                .help("Exclude to get not forward match keyword in category")
                 .takes_value(true),
         )
         .subcommand(SubCommand::with_name("init").about("Initialize configurations interactively"))

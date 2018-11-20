@@ -45,6 +45,12 @@ impl Query {
         }
     }
 
+    pub fn not_in(&self, keyword: String) -> Query {
+        Query{
+            string: format!("{self} -in:{keyword}", self=&self.string, keyword=keyword),
+        }
+    }
+
     pub fn to_string(self) -> String {
         self.string
     }
@@ -84,6 +90,14 @@ mod tests {
         let subject = Query::new().updated_lt(updated).to_string();
 
         assert_eq!(subject, " updated:<2018-08-26");
+    }
+
+    #[test]
+    fn build_query_not_in() {
+        let keyword = "category".to_string();
+        let subject = Query::new().not_in(keyword).to_string();
+
+        assert_eq!(subject, " -in:category");
     }
 
     #[test]
