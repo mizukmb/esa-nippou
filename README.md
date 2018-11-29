@@ -1,5 +1,7 @@
 # esa-nippou
 
+[![CircleCI](https://circleci.com/gh/mizukmb/esa-nippou/tree/master.svg?style=svg)](https://circleci.com/gh/mizukmb/esa-nippou/tree/master)
+
 `esa-nippou` is print today's your [esa.io](https://esa.io) articles.
 
 `esa-nippou` is inspired by [masutaka/github-nippou](https://github.com/masutaka/github-nippou).
