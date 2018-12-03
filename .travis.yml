@@ -2,24 +2,22 @@ language: rust
 os: osx
 rust: stable
 env: TARGET=x86_64-apple-darwin
-branches:
-  only:
-  - master
+cache: cargo
 
 script:
-- cargo test --verbose --all
+  - cargo test --all
 
 before_deploy:
-- cargo build --target $TARGET --release
-- mkdir "esa-nippou_${TRAVIS_TAG}_${TARGET}"
-- cp ./target/release/esa-nippou ./LICENSE ./README.md "esa-nippou_${TRAVIS_TAG}_${TARGET}"
-- zip "esa-nippou_${TRAVIS_TAG}_${TARGET}.zip" -r "esa-nippou_${TRAVIS_TAG}_${TARGET}"
+  - cargo build --target $TARGET --release
+  - mkdir "esa-nippou_${TRAVIS_TAG}_${TARGET}"
+  - cp target/$TARGET/release/esa-nippou LICENSE README.md "esa-nippou_${TRAVIS_TAG}_${TARGET}"
+  - zip "esa-nippou_${TRAVIS_TAG}_${TARGET}.zip" -r "esa-nippou_${TRAVIS_TAG}_${TARGET}"
 
 deploy:
   provider: releases
-  api_key:
-    secure: uzt3i82toEQCkaQme3dwG4HKMvwmtby2J6HihMCCKnv6LCeNtPtr1mp+LdLFqABYIWPySoQUx2Ild5Vii5lbf0WbB3ot9Iv2olzMZodUblHupZJeKeAZ9lfU+I2CV3XqNxLMqU6OjtVrhfjqOd46GEWqqdY3rX4DXZrLpHe28+uiuXuxl/9F2Yq1tiHCg2tBqQVQN0zI7+srh/QOh8RixNlgpujX+UrM8z9fhTausQ+1ImkTPoFPw+0Epq41N3x47reTpPMRDzwNjudK+7/cz2mla88Wk/UiYPaODl4RwYTDM7W8WUeOeDLLWOCgZdsdjy3tRqGVNBd7VsWpysZ1V75Z+wypUW4HejPIOR/48ZtW2BH+DnDNS3jO9170sUqLwhpnZh/98HFQrlm2C+4FtvwJwRMge7w8CO0D59lj9jZM0k7qXdQcyiWuATD/pA5V1e+Vi6GnQhFMqIn4BtYrJ1IditjKXPL8guQa8Vh9gDRb3Y7MwZvcIpwPjlHcNuT2H5la+iWXBTfug3YUzEKHFhJbdUrapbtE5eZFUUz31GZk+g8nmKfYDFQNOZ3lsdRTamn9fKe9OXihgavAEW1vXT+TjnuRRVhd8L/XanKwewY/JBq2HqyBduTvcdKQJhfDb5NieeHUvKXo8CfVMgyoz3KdIfpdnbMPmVBVi9+XuJg=
+  api_key: $GITHUB_TOKEN
   file: esa-nippou_${TRAVIS_TAG}_${TARGET}.zip
+  skip_cleanup: true
   on:
     repo: mizukmb/esa-nippou
     tags: true
