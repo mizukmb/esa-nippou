@@ -46,8 +46,12 @@ impl Query {
     }
 
     pub fn not_in(&self, keyword: String) -> Query {
-        Query{
-            string: format!("{self} -in:{keyword}", self=&self.string, keyword=keyword),
+        Query {
+            string: format!(
+                "{self} -in:{keyword}",
+                self = &self.string,
+                keyword = keyword
+            ),
         }
     }
 

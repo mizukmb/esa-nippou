@@ -19,7 +19,8 @@ impl EsaConfig {
             f,
             "esanippou:\n  team: {}\n  screen_name: {}\n  parsonal_access_token: {}",
             self.team, self.screen_name, self.parsonal_access_token
-        ).unwrap();
+        )
+        .unwrap();
     }
 }
 
