@@ -2,6 +2,7 @@
 name = "esa-nippou"
 version = "1.0.1"
 authors = ["mizukmb <mizukmb6@gmail.com>"]
+edition = "2018"
 
 [dependencies]
 clap = "2.31.2"
