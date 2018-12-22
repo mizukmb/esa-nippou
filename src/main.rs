@@ -21,13 +21,14 @@ mod article;
 mod esa;
 mod esa_config;
 
-fn extract(value: esa::api::Posts) -> Vec<article::Article> {
+fn extract(value: esa::api::Posts, team: String) -> Vec<article::Article> {
     let mut articles: Vec<article::Article> = Vec::new();
 
     for i in value.posts {
         articles.push(article::Article::new((
             i.full_name,
             i.url,
+            team.clone(),
             i.created_by.screen_name,
             i.updated_by.screen_name,
             i.created_at,
@@ -39,7 +40,12 @@ fn extract(value: esa::api::Posts) -> Vec<article::Article> {
     articles
 }
 
-fn post(url: &String, query: &String, access_token: &String) -> Vec<article::Article> {
+fn post(
+    url: &String,
+    query: &String,
+    access_token: &String,
+    team: String,
+) -> Vec<article::Article> {
     let posts_client = reqwest::Client::new();
     let mut posts_res = posts_client
         .get(url)
@@ -52,7 +58,7 @@ fn post(url: &String, query: &String, access_token: &String) -> Vec<article::Art
 
     let posts_value: esa::api::Posts = serde_json::from_str(&posts_res.text().unwrap()).unwrap();
 
-    extract(posts_value)
+    extract(posts_value, team)
 }
 
 fn run(app: ArgMatches) {
@@ -107,7 +113,7 @@ fn run(app: ArgMatches) {
         query
     };
 
-    let updated_articles = post(&posts_url, &query.to_string(), &access_token);
+    let updated_articles = post(&posts_url, &query.to_string(), &access_token, team.clone());
 
     println!("### {team}.esa.io", team = team);
     println!(""); // for new line
