@@ -1,6 +1,6 @@
 [package]
 name = "esa-nippou"
-version = "1.0.1"
+version = "1.0.2"
 authors = ["mizukmb <mizukmb6@gmail.com>"]
 edition = "2018"
 
