@@ -1,5 +1,7 @@
 # esa-nippou
 
+[![Build Status](https://travis-ci.com/mizukmb/esa-nippou.svg?branch=master)](https://travis-ci.com/mizukmb/esa-nippou)
+
 
 `esa-nippou` is print today's your [esa.io](https://esa.io) articles.
 
