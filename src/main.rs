@@ -20,6 +20,7 @@ use std::io::Write;
 mod article;
 mod esa;
 mod esa_config;
+mod subcommand;
 
 fn extract(value: esa::api::Posts, team: String) -> Vec<article::Article> {
     let mut articles: Vec<article::Article> = Vec::new();
@@ -123,28 +124,6 @@ fn run(app: ArgMatches) {
     }
 }
 
-fn init() {
-    let mut team = String::new();
-    let mut screen_name = String::new();
-
-    let parsonal_access_token =
-        rpassword::prompt_password_stdout("Personal access token (hidden): ").unwrap();
-    print!("Team: ");
-    io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut team).unwrap();
-    print!("Screen name: ");
-    io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut screen_name).unwrap();
-
-    let config = esa_config::new((
-        team.trim().to_string(),
-        screen_name.trim().to_string(),
-        parsonal_access_token.trim().to_string(),
-    ));
-
-    config.write();
-}
-
 fn main() {
     let name = env!("CARGO_PKG_NAME");
     let version = env!("CARGO_PKG_VERSION");
@@ -189,7 +168,7 @@ fn main() {
         .get_matches();
 
     match app.subcommand_name() {
-        Some("init") => init(),
+        Some("init") => subcommand::init(),
         _ => run(app),
     }
 }
