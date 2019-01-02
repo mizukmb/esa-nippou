@@ -14,8 +14,6 @@ use chrono::prelude::*;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use reqwest::header::{Authorization, Bearer};
 use std::env;
-use std::io;
-use std::io::Write;
 
 mod article;
 mod esa;

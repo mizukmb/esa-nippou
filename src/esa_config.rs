@@ -1,7 +1,7 @@
 extern crate serde_yaml;
+extern crate dirs;
 
 use serde_json::Value;
-use std::env;
 use std::fs;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::str;
@@ -56,7 +56,7 @@ pub fn load() -> EsaConfig {
 fn filename() -> String {
     format!(
         "{path}/{file}",
-        path = env::home_dir().unwrap().to_str().unwrap(),
+        path = dirs::home_dir().unwrap().to_str().unwrap(),
         file = ".esanippourc"
     )
 }
