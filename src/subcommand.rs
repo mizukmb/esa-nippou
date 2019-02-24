@@ -1,6 +1,6 @@
+use super::esa_config;
 use std::io;
 use std::io::Write;
-use super::esa_config;
 
 pub fn init() {
     let mut team = String::new();

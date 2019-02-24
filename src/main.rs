@@ -61,7 +61,7 @@ fn post(
 }
 
 fn run(app: ArgMatches) {
-    let config = esa_config::load();
+    let config = esa_config::load().unwrap();
     let base_url = "https://api.esa.io";
     let api_version = "v1";
     let team = match env::var("ESA_NIPPOU_TEAM") {
