@@ -1,5 +1,6 @@
-extern crate serde_yaml;
 extern crate dirs;
+extern crate failure;
+extern crate serde_yaml;
 
 use serde_json::Value;
 use std::fs;
@@ -32,25 +33,21 @@ pub fn new(p: (String, String, String)) -> EsaConfig {
     }
 }
 
-pub fn load() -> EsaConfig {
-    let mut f = BufReader::new(fs::File::open(filename()).unwrap());
+pub fn load() -> Result<EsaConfig, failure::Error> {
+    let mut f = BufReader::new(fs::File::open(filename())?);
     let mut buf = vec![];
 
-    f.read_to_end(&mut buf).unwrap();
+    f.read_to_end(&mut buf)?;
 
-    let value: Value = serde_yaml::from_str(str::from_utf8(&buf).unwrap()).unwrap();
+    let value: Value = serde_yaml::from_str(str::from_utf8(&buf)?)?;
 
-    EsaConfig {
-        team: value["esanippou"]["team"].as_str().unwrap().to_string(),
-        screen_name: value["esanippou"]["screen_name"]
-            .as_str()
-            .unwrap()
-            .to_string(),
+    Ok(EsaConfig {
+        team: value["esanippou"]["team"].is_string().to_string(),
+        screen_name: value["esanippou"]["screen_name"].is_string().to_string(),
         parsonal_access_token: value["esanippou"]["parsonal_access_token"]
-            .as_str()
-            .unwrap()
+            .is_string()
             .to_string(),
-    }
+    })
 }
 
 fn filename() -> String {
