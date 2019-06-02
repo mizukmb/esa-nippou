@@ -42,10 +42,14 @@ pub fn load() -> Result<EsaConfig, failure::Error> {
     let value: Value = serde_yaml::from_str(str::from_utf8(&buf)?)?;
 
     Ok(EsaConfig {
-        team: value["esanippou"]["team"].is_string().to_string(),
-        screen_name: value["esanippou"]["screen_name"].is_string().to_string(),
+        team: value["esanippou"]["team"].as_str().unwrap().to_string(),
+        screen_name: value["esanippou"]["screen_name"]
+            .as_str()
+            .unwrap()
+            .to_string(),
         parsonal_access_token: value["esanippou"]["parsonal_access_token"]
-            .is_string()
+            .as_str()
+            .unwrap()
             .to_string(),
     })
 }
