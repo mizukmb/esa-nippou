@@ -12,7 +12,6 @@ extern crate serde_derive;
 
 use chrono::prelude::*;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use reqwest::header::{Authorization, Bearer};
 use std::env;
 
 mod article;
@@ -48,9 +47,7 @@ fn post(
     let posts_client = reqwest::Client::new();
     let mut posts_res = posts_client
         .get(url)
-        .header(Authorization(Bearer {
-            token: access_token.to_string(),
-        }))
+        .bearer_auth(access_token)
         .query(&[("q", query)])
         .send()
         .unwrap();
