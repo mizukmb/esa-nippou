@@ -61,9 +61,13 @@ fn run(app: ArgMatches) {
     let config = esa_config::load().unwrap();
     let base_url = "https://api.esa.io";
     let api_version = "v1";
-    let team = match env::var("ESA_NIPPOU_TEAM") {
-        Ok(val) => val,
-        Err(_e) => config.team,
+    let team = if app.is_present("team") {
+        app.value_of("team").unwrap().to_string()
+    } else {
+        match env::var("ESA_NIPPOU_TEAM") {
+            Ok(val) => val,
+            Err(_e) => config.team,
+        }
     };
     let posts_url = format!(
         "{base_url}/{api_version}/teams/{team}/posts",
@@ -157,6 +161,14 @@ fn main() {
                 .long("not-in")
                 .value_name("KEYWORD")
                 .help("Exclude to get not forward match keyword in category")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("team")
+                .short("t")
+                .long("team")
+                .value_name("TEAM")
+                .help("Team name")
                 .takes_value(true),
         )
         .subcommand(SubCommand::with_name("init").about("Initialize configurations interactively"))
