@@ -63,4 +63,31 @@ impl Article {
 
         md
     }
+
+    pub fn to_scrapbox_link(&self) -> String {
+        let members_url = format!("https://{team}.esa.io/members", team = self.team);
+        let mut sb = format!(" [{title} {url}]", title = self.title, url = self.url);
+
+        if self.created_at == self.updated_at {
+            sb = format!(
+                "{sb} created by [{created_by} {members_url}/{created_by}]",
+                sb = &sb,
+                created_by = self.created_by,
+                members_url = members_url
+            );
+        } else {
+            sb = format!(
+                "{sb} updated by [{updated_by} {members_url}/{updated_by}]",
+                sb = &sb,
+                updated_by = self.updated_by,
+                members_url = members_url
+            );
+        }
+
+        if self.wip {
+            sb = format!("{sb} [* WIP]", sb = &sb);
+        }
+
+        sb
+    }
 }
