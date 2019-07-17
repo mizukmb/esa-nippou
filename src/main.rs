@@ -115,12 +115,29 @@ fn run(app: ArgMatches) {
 
     let updated_articles = post(&posts_url, &query.to_string(), &access_token, team.clone());
 
-    println!("### {team}.esa.io", team = team);
-    println!(""); // for new line
+    let format = match app.value_of("format") {
+        Some(v) => v,
+        None => "markdown",
+    };
 
-    for article in updated_articles {
-        println!("{}", article.to_markdown_link());
+    match format {
+        "scrapbox" => {
+            println!("[*** {team}.esa.io]", team = team);
+
+            for article in updated_articles {
+                println!("{}", article.to_scrapbox_link());
+            }
+        },
+        "markdown" | _ => {
+            println!("### {team}.esa.io", team = team);
+            println!(""); // for new line
+
+            for article in updated_articles {
+                println!("{}", article.to_markdown_link());
+            }
+        },
     }
+
 }
 
 fn main() {
@@ -132,6 +149,14 @@ fn main() {
         .version(version)
         .author(author)
         .about(about)
+        .arg(
+            Arg::with_name("format")
+                .short("f")
+                .long("format")
+                .value_name("FORMAT")
+                .help("Select format type: markdown (default), scrapbox")
+                .takes_value(true),
+        )
         .arg(
             Arg::with_name("wip")
                 .short("w")
