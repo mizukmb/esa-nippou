@@ -11,6 +11,6 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: icepuma/rust-action@1.0.9
     - name: Run test on ${{ matrix.os }}
       run: cargo test --verbose
