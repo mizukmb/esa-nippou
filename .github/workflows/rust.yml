@@ -3,13 +3,16 @@ name: Rust
 on: [push]
 
 jobs:
-  build:
+  test:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
 
     steps:
     - uses: actions/checkout@v1
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+    - name: Install Cargo
+      run: which cargo > /dev/null 2>&1 || curl https://sh.rustup.rs -sSf | sh -s -- -y
+    - name: Run test
+      run: $HOME/.cargo/bin/cargo test --verbose
