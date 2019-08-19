@@ -12,5 +12,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Run test on OS: ${{ matrix.os }}
+    - name: Run test on ${{ matrix.os }}
       run: cargo test --verbose
