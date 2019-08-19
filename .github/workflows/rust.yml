@@ -13,6 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install Cargo
-      run: which cargo > /dev/null 2>&1 || curl https://sh.rustup.rs -sSf | sh
-    - name: Run test on ${{ matrix.os }}
+      run: which cargo > /dev/null 2>&1 || curl https://sh.rustup.rs -sSf | sh -s -- -y
+    - name: Run test
       run: cargo test --verbose
