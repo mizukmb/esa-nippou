@@ -13,6 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install Cargo
-      run: which cargo > /dev/null 2>&1 && curl -sSf https://static.rust-lang.org/rustup.sh | sh
+      run: which cargo > /dev/null 2>&1 || curl -sSf https://static.rust-lang.org/rustup.sh | sh
     - name: Run test on ${{ matrix.os }}
       run: cargo test --verbose
