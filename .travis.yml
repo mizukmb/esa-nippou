@@ -10,9 +10,6 @@ matrix:
       env: TARGET=x86_64-apple-darwin
       cache: cargo
 
-script:
-  - cargo test --all
-
 before_deploy:
   - cargo build --target $TARGET --release
   - mkdir "esa-nippou_${TRAVIS_TAG}_${TARGET}"
