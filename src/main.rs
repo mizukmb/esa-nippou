@@ -15,6 +15,7 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 use std::env;
 
 mod article;
+mod client;
 mod esa;
 mod esa_config;
 mod subcommand;
@@ -38,29 +39,8 @@ fn extract(value: esa::api::Posts, team: String) -> Vec<article::Article> {
     articles
 }
 
-fn post(
-    url: &String,
-    query: &String,
-    access_token: &String,
-    team: String,
-) -> Vec<article::Article> {
-    let posts_client = reqwest::Client::new();
-    let mut posts_res = posts_client
-        .get(url)
-        .bearer_auth(access_token)
-        .query(&[("q", query)])
-        .send()
-        .unwrap();
-
-    let posts_value: esa::api::Posts = serde_json::from_str(&posts_res.text().unwrap()).unwrap();
-
-    extract(posts_value, team)
-}
-
 fn run(app: ArgMatches) {
     let config = esa_config::load().unwrap();
-    let base_url = "https://api.esa.io";
-    let api_version = "v1";
     let team = if app.is_present("team") {
         app.value_of("team").unwrap().to_string()
     } else {
@@ -69,12 +49,6 @@ fn run(app: ArgMatches) {
             Err(_e) => config.team,
         }
     };
-    let posts_url = format!(
-        "{base_url}/{api_version}/teams/{team}/posts",
-        base_url = base_url,
-        api_version = api_version,
-        team = team
-    );
 
     let access_token = match env::var("ESA_NIPPOU_ACCESS_TOKEN") {
         Ok(val) => val,
@@ -113,7 +87,11 @@ fn run(app: ArgMatches) {
         query
     };
 
-    let updated_articles = post(&posts_url, &query.to_string(), &access_token, team.clone());
+    let esa_client = client::Client::new(access_token);
+    let posts_value =
+        serde_json::from_str(&esa_client.get_posts(team.clone(), query).unwrap()).unwrap();
+
+    let updated_articles = extract(posts_value, team.clone());
 
     let format = match app.value_of("format") {
         Some(v) => v,
@@ -127,7 +105,7 @@ fn run(app: ArgMatches) {
             for article in updated_articles {
                 println!("{}", article.to_scrapbox_link());
             }
-        },
+        }
         "markdown" | _ => {
             println!("### {team}.esa.io", team = team);
             println!(""); // for new line
@@ -135,9 +113,8 @@ fn run(app: ArgMatches) {
             for article in updated_articles {
                 println!("{}", article.to_markdown_link());
             }
-        },
+        }
     }
-
 }
 
 fn main() {
