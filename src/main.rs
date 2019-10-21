@@ -100,18 +100,22 @@ fn run(app: ArgMatches) {
 
     match format {
         "scrapbox" => {
-            println!("[*** {team}.esa.io]", team = team);
+            if !updated_articles.is_empty() {
+                println!("[*** {team}.esa.io]", team = team);
 
-            for article in updated_articles {
-                println!("{}", article.to_scrapbox_link());
+                for article in updated_articles {
+                    println!("{}", article.to_scrapbox_link());
+                }
             }
         }
         "markdown" | _ => {
-            println!("### {team}.esa.io", team = team);
-            println!(""); // for new line
+            if !updated_articles.is_empty() {
+                println!("### {team}.esa.io", team = team);
+                println!(""); // for new line
 
-            for article in updated_articles {
-                println!("{}", article.to_markdown_link());
+                for article in updated_articles {
+                    println!("{}", article.to_markdown_link());
+                }
             }
         }
     }
