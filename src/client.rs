@@ -1,7 +1,7 @@
 #[cfg(test)]
 extern crate mockito;
 
-use super::esa::query::Query;
+use super::query::Query;
 use reqwest::Client as rc;
 
 #[derive(Debug, PartialEq)]

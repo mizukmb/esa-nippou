@@ -14,13 +14,14 @@ use chrono::prelude::*;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use std::env;
 
+mod api;
 mod article;
 mod client;
-mod esa;
 mod esa_config;
+mod query;
 mod subcommand;
 
-fn extract(value: esa::api::Posts, team: String) -> Vec<article::Article> {
+fn extract(value: api::Posts, team: String) -> Vec<article::Article> {
     let mut articles: Vec<article::Article> = Vec::new();
 
     for i in value.posts {
@@ -65,9 +66,7 @@ fn run(app: ArgMatches) {
         Err(_e) => config.screen_name,
     };
 
-    let mut query = esa::query::Query::new()
-        .user(screen_name)
-        .updated_gt(since_date);
+    let mut query = query::Query::new().user(screen_name).updated_gt(since_date);
 
     query = if app.is_present("until_date") {
         query.updated_lt(app.value_of("until_date").unwrap().to_string())
