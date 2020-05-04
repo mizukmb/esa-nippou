@@ -1,5 +1,4 @@
-use chrono::prelude::DateTime;
-use chrono::prelude::Local;
+use chrono::prelude::{DateTime, Local};
 
 pub struct Article {
     title: String,
@@ -89,5 +88,95 @@ impl Article {
         }
 
         sb
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::prelude::{TimeZone};
+
+    #[test]
+    fn build_to_markdown_link_when_creted_at_and_updated_at_are_same() {
+        let article = Article::new((
+            String::from("test-title"),
+            String::from("test-url"),
+            String::from("test-team"),
+            String::from("test-created-by-user"),
+            String::from("test-updated-by-user"),
+            Local
+                .datetime_from_str("2020/05/04 12:00:00", "%Y/%m/%d %H:%M:%S")
+                .unwrap(),
+            Local
+                .datetime_from_str("2020/05/04 12:00:00", "%Y/%m/%d %H:%M:%S")
+                .unwrap(),
+            false,
+        ));
+        let expected_str = "- [test-title](test-url) created by :@test-created-by-user: [test-created-by-user](https://test-team.esa.io/members/test-created-by-user)";
+
+        assert_eq!(article.to_markdown_link(), String::from(expected_str));
+    }
+
+    #[test]
+    fn build_to_markdown_link_when_creted_at_and_updated_at_are_difirrent() {
+        let article = Article::new((
+            String::from("test-title"),
+            String::from("test-url"),
+            String::from("test-team"),
+            String::from("test-created-by-user"),
+            String::from("test-updated-by-user"),
+            Local
+                .datetime_from_str("2020/05/04 12:00:00", "%Y/%m/%d %H:%M:%S")
+                .unwrap(),
+            Local
+                .datetime_from_str("2020/05/04 13:00:00", "%Y/%m/%d %H:%M:%S")
+                .unwrap(),
+            false,
+        ));
+        let expected_str = "- [test-title](test-url) updated by :@test-updated-by-user: [test-updated-by-user](https://test-team.esa.io/members/test-updated-by-user)";
+
+        assert_eq!(article.to_markdown_link(), String::from(expected_str));
+    }
+
+    #[test]
+    fn build_to_scrapbox_link_when_creted_at_and_updated_at_are_same() {
+        let article = Article::new((
+            String::from("test-title"),
+            String::from("test-url"),
+            String::from("test-team"),
+            String::from("test-created-by-user"),
+            String::from("test-updated-by-user"),
+            Local
+                .datetime_from_str("2020/05/04 12:00:00", "%Y/%m/%d %H:%M:%S")
+                .unwrap(),
+            Local
+                .datetime_from_str("2020/05/04 12:00:00", "%Y/%m/%d %H:%M:%S")
+                .unwrap(),
+            false,
+        ));
+        let expected_str = " [test-title test-url] created by [test-created-by-user https://test-team.esa.io/members/test-created-by-user]";
+
+        assert_eq!(article.to_scrapbox_link(), String::from(expected_str));
+    }
+
+    #[test]
+    fn build_to_scrapbox_link_when_creted_at_and_updated_at_are_difirrent() {
+        let article = Article::new((
+            String::from("test-title"),
+            String::from("test-url"),
+            String::from("test-team"),
+            String::from("test-created-by-user"),
+            String::from("test-updated-by-user"),
+            Local
+                .datetime_from_str("2020/05/04 12:00:00", "%Y/%m/%d %H:%M:%S")
+                .unwrap(),
+            Local
+                .datetime_from_str("2020/05/04 13:00:00", "%Y/%m/%d %H:%M:%S")
+                .unwrap(),
+            false,
+        ));
+        let expected_str = " [test-title test-url] updated by [test-updated-by-user https://test-team.esa.io/members/test-updated-by-user]";
+
+        assert_eq!(article.to_scrapbox_link(), String::from(expected_str));
     }
 }
